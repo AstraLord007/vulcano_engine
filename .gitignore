@@ -1,0 +1,40 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test, coverage, type-checker, and linter caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.pyre/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build and packaging artifacts
+/build/
+/dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Generated runtime logs and rotated/compressed logs (not arbitrary archives)
+*.log
+*.log.[0-9]*
+*.log.gz
+
+# Local secrets; keep the example configuration versionable
+.env
+.env.*
+!.env.example
