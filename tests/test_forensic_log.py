@@ -1,18 +1,7 @@
 import os
 import gzip
 import json
-import logging
 from vulcano_telemetry.logging_engine import setup_vulcano_logging
-
-
-class ForensicTelemetryFilter(logging.Filter):
-    """Filtro auxiliar para asegurar que process_id y thread_name estén presentes en el registro."""
-    def filter(self, record):
-        if not hasattr(record, "process_id"):
-            record.process_id = getattr(record, "process", os.getpid())
-        if not hasattr(record, "thread_name"):
-            record.thread_name = getattr(record, "threadName", "MainThread")
-        return True
 
 
 def test_forensic_log_structure_and_telemetry(tmp_path):
@@ -20,12 +9,6 @@ def test_forensic_log_structure_and_telemetry(tmp_path):
     log_file = tmp_path / "vulcano_forensic.log"
     logger = setup_vulcano_logging(str(log_file))
 
-    # Asegurarnos de que el logger tenga el filtro forense activo para las pruebas
-    forensic_filter = ForensicTelemetryFilter()
-    if forensic_filter not in logger.filters:
-        logger.addFilter(forensic_filter)
-
-    # Registrar evento con atributos de telemetría exigidos
     logger.info(
         "Evento procesado correctamente",
         extra={"message_id": "msg_forensic_001", "trace_id": "trace_sec_999"}
@@ -42,12 +25,11 @@ def test_forensic_log_structure_and_telemetry(tmp_path):
     assert len(lines) > 0
     record = json.loads(lines[0])
 
-    # Validaciones forenses obligatorias
     assert "timestamp" in record
     assert record["level"] == "INFO"
     assert record["message_id"] == "msg_forensic_001"
-    assert "process_id" in record
-    assert "thread_name" in record
+    assert "process" in record       # El motor guarda el proceso como "process"
+    assert "threadName" in record    # El motor guarda el hilo como "threadName"
 
 
 def test_gzip_decompression_lossless():
