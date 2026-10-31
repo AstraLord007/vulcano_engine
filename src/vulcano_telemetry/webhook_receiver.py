@@ -2,9 +2,11 @@
 
 import os
 import time
+
 from fastapi import FastAPI, Header, HTTPException, Request, status
-from .webhook_crypto import verify_signature
+
 from .exceptions import WebhookSignatureError, WebhookTimestampError
+from .webhook_crypto import verify_signature
 
 app = FastAPI(title="Vulcano Pay Webhook Receiver")
 

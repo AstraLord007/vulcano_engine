@@ -4,6 +4,7 @@ import argparse
 import re
 from urllib.parse import urlparse
 
+
 def parse_queue_name(value: str) -> str:
     """Valida que el nombre de la cola cumpla con el patrón vulcano-<nombre>-queue."""
     pattern = r"^vulcano-[a-z0-9-]+-queue$"

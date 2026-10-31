@@ -1,23 +1,25 @@
 import argparse
-import time
 import json
+import time
+
 import requests
 import uvicorn
-from vulcano_telemetry.sanitizer import (
-    parse_queue_name,
-    parse_wait_time,
-    parse_webhook_url,
-    parse_secret_key,
-)
-from vulcano_telemetry.core_sqs import get_sqs_client, produce_event, consume_events
-from vulcano_telemetry.webhook_crypto import generate_signature
-from vulcano_telemetry.logging_engine import setup_vulcano_logging
+
+from vulcano_telemetry.core_sqs import consume_events, get_sqs_client, produce_event
 from vulcano_telemetry.exceptions import (
     SQSConnectionError,
+    WebhookDeliveryError,
     WebhookSignatureError,
     WebhookTimestampError,
-    WebhookDeliveryError,
 )
+from vulcano_telemetry.logging_engine import setup_vulcano_logging
+from vulcano_telemetry.sanitizer import (
+    parse_queue_name,
+    parse_secret_key,
+    parse_wait_time,
+    parse_webhook_url,
+)
+from vulcano_telemetry.webhook_crypto import generate_signature
 
 logger = setup_vulcano_logging()
 

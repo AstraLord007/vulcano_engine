@@ -1,7 +1,8 @@
 """Utilidades criptográficas para la firma y verificación de Webhooks con HMAC-SHA256."""
 
-import hmac
 import hashlib
+import hmac
+
 
 def generate_signature(secret: str, payload: bytes, *args, **kwargs) -> str:
     """Genera una firma HMAC-SHA256 en hexadecimal para el cuerpo del mensaje."""
