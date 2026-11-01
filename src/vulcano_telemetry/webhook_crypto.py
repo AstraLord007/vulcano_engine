@@ -1,29 +1,40 @@
-"""Utilidades criptográficas para la firma y verificación de Webhooks con HMAC-SHA256."""
+"""Módulo de seguridad criptográfica HMAC-SHA256 para Webhooks."""
 
-import hashlib
 import hmac
+import hashlib
+import time
+from .exceptions import WebhookSignatureError, WebhookTimestampError
 
+def generate_signature(secret: str, timestamp: int, payload_bytes: bytes) -> str:
+    """Genera la firma HMAC-SHA256 en formato hex sobre timestamp.payload_bytes."""
+    to_sign = f"{timestamp}.".encode("utf-8") + payload_bytes
+    return hmac.new(secret.encode("utf-8"), to_sign, hashlib.sha256).hexdigest()
 
-def generate_signature(secret: str, payload: bytes, *args, **kwargs) -> str:
-    """Genera una firma HMAC-SHA256 en hexadecimal para el cuerpo del mensaje."""
-    if isinstance(secret, str):
-        secret_bytes = secret.encode("utf-8")
-    else:
-        secret_bytes = secret
-        
-    if isinstance(payload, str):
-        payload_bytes = payload.encode("utf-8")
-    else:
-        payload_bytes = payload
+def verify_signature(secret: str, header_value: str, payload_bytes: bytes, tolerance_sec: int = 300) -> bool:
+    """
+    Verifica la cabecera X-Webhook-Signature (formato: t=timestamp,v1=signature).
+    Protege contra Replay Attacks (timestamp) y Timing Attacks (hmac.compare_digest).
+    """
+    if not header_value or "t=" not in header_value or "v1=" not in header_value:
+        raise WebhookSignatureError("Cabecera X-Webhook-Signature malformada o ausente.")
 
-    signature = hmac.new(secret_bytes, payload_bytes, hashlib.sha256).hexdigest()
-    return f"sha256={signature}"
+    try:
+        parts = dict(item.split("=", 1) for item in header_value.split(","))
+        timestamp = int(parts.get("t", 0))
+        received_sig = parts.get("v1", "")
+    except (ValueError, AttributeError) as err:
+        raise WebhookSignatureError("Estructura de la cabecera de firma inválida.") from err
 
+    # 1. Mitigación de Replay Attacks (Verificación de Tolerancia Temporal)
+    current_time = int(time.time())
+    if abs(current_time - timestamp) > tolerance_sec:
+        raise WebhookTimestampError(
+            f"Timestamp fuera de tolerancia temporal ({abs(current_time - timestamp)}s > {tolerance_sec}s)."
+        )
 
-def verify_signature(secret: str, payload: bytes, signature_header: str) -> bool:
-    """Compara de forma segura (constant-time) la firma recibida con la calculada localmente."""
-    if not signature_header:
-        return False
-    
-    expected_signature = generate_signature(secret, payload)
-    return hmac.compare_digest(expected_signature, signature_header)
+    # 2. Mitigación de Timing Attacks (Comparación en Tiempo Constante)
+    expected_sig = generate_signature(secret, timestamp, payload_bytes)
+    if not hmac.compare_digest(expected_sig, received_sig):
+        raise WebhookSignatureError("La firma criptográfica HMAC-SHA256 no coincide.")
+
+    return True
