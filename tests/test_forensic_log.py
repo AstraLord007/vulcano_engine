@@ -1,6 +1,7 @@
-import os
 import gzip
 import json
+import os
+
 from vulcano_telemetry.logging_engine import setup_vulcano_logging
 
 

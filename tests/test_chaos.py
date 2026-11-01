@@ -1,13 +1,15 @@
 """Pruebas de caos e inyección de fallos para webhooks y SQS en Vulcano Pay."""
 
-import time
 import json
 import socket
+import time
+
 import pytest
 from fastapi.testclient import TestClient
-from vulcano_telemetry.webhook_receiver import app, WEBHOOK_SECRET
-from vulcano_telemetry.webhook_crypto import generate_signature
+
 from vulcano_telemetry.core_sqs import get_sqs_client
+from vulcano_telemetry.webhook_crypto import generate_signature
+from vulcano_telemetry.webhook_receiver import WEBHOOK_SECRET, app
 
 client = TestClient(app)
 
