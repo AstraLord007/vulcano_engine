@@ -1,6 +1,6 @@
 """Script de prueba local para validar el módulo core_sqs con LocalStack."""
 
-from src.vulcano_telemetry.core_sqs import (
+from vulcano_telemetry.core_sqs import (
     consume_events,
     delete_event,
     get_sqs_client,
