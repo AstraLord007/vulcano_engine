@@ -1,13 +1,15 @@
 """Módulo de seguridad criptográfica HMAC-SHA256 para Webhooks."""
 
-import hmac
 import hashlib
+import hmac
 import time
+
 from .exceptions import WebhookSignatureError, WebhookTimestampError
+
 
 def generate_signature(secret: str, timestamp: int, payload_bytes: bytes) -> str:
     """Genera la firma HMAC-SHA256 en formato hex sobre timestamp.payload_bytes."""
-    to_sign = f"{timestamp}.".encode("utf-8") + payload_bytes
+    to_sign = f"{timestamp}.".encode() + payload_bytes
     return hmac.new(secret.encode("utf-8"), to_sign, hashlib.sha256).hexdigest()
 
 def verify_signature(secret: str, header_value: str, payload_bytes: bytes, tolerance_sec: int = 300) -> bool:

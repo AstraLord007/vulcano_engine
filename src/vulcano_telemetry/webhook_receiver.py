@@ -1,10 +1,12 @@
 """Servidor HTTP Receptor de Webhooks utilizando FastAPI y Boto3 LocalStack."""
 
 import logging
-from fastapi import FastAPI, Request, HTTPException, status
-from .webhook_crypto import verify_signature
+
+from fastapi import FastAPI, HTTPException, Request, status
+
 from .core_sqs import get_sqs_client, produce_event
 from .exceptions import WebhookSignatureError, WebhookTimestampError
+from .webhook_crypto import verify_signature
 
 logger = logging.getLogger("vulcano_engine")
 app = FastAPI(title="Vulcano Webhook Receiver", description="Servidor receptor de Webhooks con validación HMAC y SQS")

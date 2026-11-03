@@ -9,7 +9,7 @@ import queue
 import shutil
 import tempfile
 import traceback
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def _exception_tree(error):
@@ -31,7 +31,7 @@ class AsyncJSONFormatter(logging.Formatter):
     def format(self, record):
         """Convierte el registro en JSON antes de su preparación para la cola."""
         event = {
-            "timestamp": datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
+            "timestamp": datetime.fromtimestamp(record.created, UTC).isoformat(),
             "logger": record.name,
             "level": record.levelname,
             "message": record.getMessage(),
