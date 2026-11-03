@@ -242,3 +242,8 @@ docker compose down
 ```
 
 El compose no persiste los datos de LocalStack entre `down` y `up`. Si se vuelve a levantar el contenedor, hay que volver a crear la cola antes de ejecutar el proyecto.
+
+## Video explicativo
+[![Ver video de demostracion](https://youtube.com)](https://youtu.be/0_iPqwZNRnc)
+
+
